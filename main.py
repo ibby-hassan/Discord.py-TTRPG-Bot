@@ -1,6 +1,7 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
+from Player import Player
 import os
 import dice
 
@@ -22,16 +23,27 @@ async def on_ready():
     except Exception as e:
         print("Couldn't sync commands", e)
 
-# Slash commands
+@client.event
+async def on_member_join(member:discord.User):
+    await member.send(f'{member.mention} has joined the lobby.')
+
+# Command to let users roll the dice
 @client.tree.command(name="roll", description="Roll a dice in NdN format")
 async def roll(interaction:discord.Interaction, dice_input:str):
     try:
         result:list = dice.roll(dice_input)
-        await interaction.response.send_message("You rolled: " + str(result))
+        await interaction.response.send_message(f"{interaction.user.mention} rolled: " + str(result))
         return
     except Exception as e:
         await interaction.response.send_message("Format has to be in NdN!", ephemeral=True)
         return
+    
+# Command to create affiliated player
+@client.tree.command(name="create_character", description="Create a player")
+async def create_character(interaction:discord.Interaction):
+    player = Player(interaction.user)
+    await interaction.response.send_message(f"{interaction.user.mention} has created a character.", ephemeral=True)
+    return
 
 # Running the bot, keep at the end of the file
 try:
