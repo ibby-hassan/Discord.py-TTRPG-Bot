@@ -1,7 +1,6 @@
 import discord
-from discord import app_commands
 from discord.ext import commands
-from Player import Player
+from game.player import Player
 import os
 import dice
 
@@ -43,6 +42,7 @@ async def roll(interaction:discord.Interaction, dice_input:str):
 async def create_character(interaction:discord.Interaction):
     player = Player(interaction.user)
     await interaction.response.send_message(f"{interaction.user.mention} has created a character.", ephemeral=True)
+    await interaction.followup.send(player)
     return
 
 # Running the bot, keep at the end of the file

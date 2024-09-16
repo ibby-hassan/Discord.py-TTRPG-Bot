@@ -1,18 +1,43 @@
 import discord
+import os
 from locations.locationType import LocationType
+import json
 
 class Player:
     def __init__(self, user:discord.User):
         self.user = user
         self.name = user.display_name
         self.hp = 100
-        self.image = None
+        self.inventory = []
         self.location = LocationType.LOBBY
 
-    def set_image(self, image):
-        self.image = image
+        self.save_player_to_file()
+    
 
-    def moveTo(self, location:LocationType):
+    """ Behaviours related to JSON memory """
+    def to_json(self):
+        player = {
+            "user_id": self.user.id,
+            "name": self.name,
+            "hp": self.hp,
+            "inventory": self.inventory,
+            "location": self.location.name
+        }
+        return player
+    
+    def save_player_to_file(self):
+            if os.path.exists('players.json'):
+                with open('players.json', 'r') as f:
+                    players = json.load(f)
+            else:
+                players = {}
+            with open('players.json', 'w') as f:
+                players[str(self.user.id)] = self.to_json()
+                json.dump(players, f, indent=4)
+
+
+    """  Gameplay related behaviours """
+    def move_to(self, location:LocationType):
         self.location = location
 
     def add_hp(self, amount:int):
